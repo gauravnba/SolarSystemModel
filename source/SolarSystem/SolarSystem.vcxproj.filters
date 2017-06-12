@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Content">
+      <UniqueIdentifier>{5e9d9e03-98ee-4f42-9b72-18ad7b49079a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Content\Shaders">
+      <UniqueIdentifier>{bbf24e6a-fa5b-4181-8a13-17ca0858e960}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Content\Models">
+      <UniqueIdentifier>{e6e32733-e22e-4f97-95ff-1fbe5b441ba7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Content\Textures">
+      <UniqueIdentifier>{b34bc6a0-2dd1-485f-8f32-ef6b0e792012}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="RenderingGame.cpp" />
+    <ClCompile Include="Program.cpp" />
+    <ClCompile Include="PointLightDemo.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Planet.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="RenderingGame.h" />
+    <ClInclude Include="PointLightDemo.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Planet.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\Models\PointLightProxy.obj.bin">
+      <Filter>Content\Models</Filter>
+    </None>
+    <None Include="Content\Models\Sphere.obj.bin">
+      <Filter>Content\Models</Filter>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Content\Shaders\PointLightDemoPS.hlsl">
+      <Filter>Content\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Content\Shaders\PointLightDemoVS.hlsl">
+      <Filter>Content\Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Content\Textures\EarthComposite.dds">
+      <Filter>Content\Textures</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
