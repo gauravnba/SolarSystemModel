@@ -47,7 +47,7 @@ namespace Rendering
 		mFpsComponent = make_shared<FpsComponent>(*this);
 		mFpsComponent->Initialize();
 
-		mCamera->SetPosition(0.0f, 2.5f, 25.0f);
+		mCamera->SetPosition(-0.0f, 2.5f, 500.0f);
 	}
 
 	void RenderingGame::Update(const GameTime &gameTime)

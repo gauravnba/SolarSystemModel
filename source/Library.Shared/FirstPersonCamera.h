@@ -33,6 +33,7 @@ namespace Library
 		float& MouseSensitivity();
         float& RotationRate();
         float& MovementRate();
+		float& MovementFactor();
         
 		virtual void Initialize() override;
         virtual void Update(const GameTime& gameTime) override;
@@ -40,6 +41,7 @@ namespace Library
 		static const float DefaultMouseSensitivity;
         static const float DefaultRotationRate;
         static const float DefaultMovementRate;
+		static const float DefaultMovementFactor;
 
 	private:
 		void UpdatePosition(const DirectX::XMFLOAT2& movementAmount, const DirectX::XMFLOAT2& rotationAmount, const GameTime& gameTime);
@@ -60,7 +62,8 @@ namespace Library
 		MouseComponent* mMouse;
 		float mMouseSensitivity;
 		float mRotationRate;
-        float mMovementRate;		
+        float mMovementRate;
+		float mMovementFactor;
     };
 }
 

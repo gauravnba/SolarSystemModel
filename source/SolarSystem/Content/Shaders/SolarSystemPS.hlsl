@@ -21,7 +21,7 @@ struct VS_OUTPUT
 	float3 WorldPosition : WORLDPOS;
 	float Attenuation : ATTENUATION;
 	float2 TextureCoordinate : TEXCOORD;
-	float3 Normal : NORMAL;	
+	float3 Normal : NORMAL;
 };
 
 float4 main(VS_OUTPUT IN) : SV_TARGET
@@ -33,7 +33,6 @@ float4 main(VS_OUTPUT IN) : SV_TARGET
 	float n_dot_l = dot(normal, lightDirection);
 	float3 halfVector = normalize(lightDirection + viewDirection);
 	float n_dot_h = dot(normal, halfVector);
-
 	float4 color = ColorMap.Sample(TextureSampler, IN.TextureCoordinate);
 	float2 lightCoefficients = lit(n_dot_l, n_dot_h, SpecularPower).yz;
 

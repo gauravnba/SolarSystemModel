@@ -35,8 +35,12 @@ namespace Rendering
 		Utility::LoadBinaryFile(L"Content\\Shaders\\SolarSystemVS.cso", compiledVertexShader);
 		ThrowIfFailed(mGame->Direct3DDevice()->CreateVertexShader(&compiledVertexShader[0], compiledVertexShader.size(), nullptr, mVertexShader.ReleaseAndGetAddressOf()), "ID3D11Device::CreatedVertexShader() failed.");
 
-		// Load a compiled pixel shader
+		// Load compiled pixel shaders
 		vector<char> compiledPixelShader;
+		Utility::LoadBinaryFile(L"Content\\Shaders\\SunShaderPS.cso", compiledPixelShader);
+		ThrowIfFailed(mGame->Direct3DDevice()->CreatePixelShader(&compiledPixelShader[0], compiledPixelShader.size(), nullptr, mSunShader.ReleaseAndGetAddressOf()), "ID3D11Device::CreatedPixelShader() failed.");
+
+		compiledPixelShader.clear();
 		Utility::LoadBinaryFile(L"Content\\Shaders\\SolarSystemPS.cso", compiledPixelShader);
 		ThrowIfFailed(mGame->Direct3DDevice()->CreatePixelShader(&compiledPixelShader[0], compiledPixelShader.size(), nullptr, mPixelShader.ReleaseAndGetAddressOf()), "ID3D11Device::CreatedPixelShader() failed.");
 
@@ -92,9 +96,9 @@ namespace Rendering
 		mGame->Direct3DDeviceContext()->UpdateSubresource(mPSCBufferPerObject.Get(), 0, nullptr, &mPSCBufferPerObjectData, 0, 0);
 
 		// Load a proxy model for the point light
-		mProxyModel = make_unique<ProxyModel>(*mGame, mCamera, "Content\\Models\\Sphere.obj.bin", 0.5f);
-		mProxyModel->Initialize();
-		mProxyModel->SetPosition(mPointLight.Position());
+		//mProxyModel = make_unique<ProxyModel>(*mGame, mCamera, "Content\\Models\\Sphere.obj.bin", 0.5f);
+		//mProxyModel->Initialize();
+		//mProxyModel->SetPosition(mPointLight.Position());
 
 		// Earth properties declarations
 		const float earthRotation = XM_PI * 5;
@@ -104,16 +108,17 @@ namespace Rendering
 		const float earthRevolution = earthRotation / 365;
 
 		// Populate the planet list
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 4.149f, nullptr)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.004f, L"Content\\Textures\\venusmap.jpg", earthAxialTilt * 0.959f, earthOrbitalDistance * 0.723f, earthScale * 0.949f, earthRevolution * 1.624f, nullptr)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation, L"Content\\Textures\\marsmap1k.jpg", 0.4392f, earthOrbitalDistance * 1.524f, earthScale * 0.532f, earthRevolution * 0.531f, nullptr)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 2.4f, L"Content\\Textures\\jupiter2_2k.jpg", 0.05352f, earthOrbitalDistance * 5.203f, earthScale * 11.19f, earthRevolution * 0.084f, nullptr)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 2.3f, L"Content\\Textures\\saturnmap.jpg", 0.4712f, earthOrbitalDistance * 9.582f, earthScale * 9.26f, earthRevolution * 0.034f, nullptr)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 1.39f, L"Content\\Textures\\uranusmap.jpg", 1.6927f, earthOrbitalDistance * 19.20f, earthScale * 4.01f, earthRevolution * 0.011f, nullptr)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 1.489f, L"Content\\Textures\\neptunemap.jpg", 0.5166f, earthOrbitalDistance * 30.5f, earthScale * 3.88f, earthRevolution * 0.0061f, nullptr)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.156f, L"Content\\Textures\\plutomap2k.jpg", 2.129f, earthOrbitalDistance * 39.48f, earthScale * 0.18f, earthRevolution * 0.004f, nullptr)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRevolution * 12, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.05f, earthScale/ 20, earthRevolution * 12, mPlanetList[2].get())));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.0408f, L"Content\\Textures\\2k_sun.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.0f, earthScale * 15.0f, earthRevolution, nullptr, false)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 4.149f, nullptr, true)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.004f, L"Content\\Textures\\venusmap.jpg", earthAxialTilt * 0.959f, earthOrbitalDistance * 0.723f, earthScale * 0.949f, earthRevolution * 1.624f, nullptr, true)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr, true)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation, L"Content\\Textures\\marsmap1k.jpg", 0.4392f, earthOrbitalDistance * 1.524f, earthScale * 0.532f, earthRevolution * 0.531f, nullptr, true)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 2.4f, L"Content\\Textures\\jupiter2_2k.jpg", 0.05352f, earthOrbitalDistance * 5.203f, earthScale * 11.19f, earthRevolution * 0.084f, nullptr, true)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 2.3f, L"Content\\Textures\\saturnmap.jpg", 0.4712f, earthOrbitalDistance * 9.582f, earthScale * 9.26f, earthRevolution * 0.034f, nullptr, true)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 1.39f, L"Content\\Textures\\uranusmap.jpg", 1.6927f, earthOrbitalDistance * 19.20f, earthScale * 4.01f, earthRevolution * 0.011f, nullptr, true)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 1.489f, L"Content\\Textures\\neptunemap.jpg", 0.5166f, earthOrbitalDistance * 30.5f, earthScale * 3.88f, earthRevolution * 0.0061f, nullptr, true)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.156f, L"Content\\Textures\\plutomap2k.jpg", 2.129f, earthOrbitalDistance * 39.48f, earthScale * 0.18f, earthRevolution * 0.004f, nullptr, true)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRevolution * 12, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.05f, earthScale/ 20, earthRevolution * 12, mPlanetList[3].get(), true)));
 	}
 
 	void SolarSystemRender::Update(const GameTime& gameTime)
@@ -132,12 +137,9 @@ namespace Rendering
 			{
 				ToggleAnimation();
 			}
-
-			UpdateAmbientLight(gameTime);
-			UpdatePointLight(gameTime);
 		}
 
-		mProxyModel->Update(gameTime);
+		//mProxyModel->Update(gameTime);
 	}
 
 	void SolarSystemRender::Draw(const GameTime& gameTime)
@@ -155,10 +157,18 @@ namespace Rendering
 		direct3DDeviceContext->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		direct3DDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
-		direct3DDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
 
 		for (uint32_t i = 0; i < mPlanetList.size(); ++i)
 		{
+			if (mPlanetList[i]->IsLit())
+			{
+				direct3DDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
+			}
+			else
+			{
+				direct3DDeviceContext->PSSetShader(mSunShader.Get(), nullptr, 0);
+			}
+
 			XMMATRIX worldMatrix = mPlanetList[i]->WorldMatrix();
 			XMMATRIX wvp = worldMatrix * mCamera->ViewProjectionMatrix();
 			wvp = XMMatrixTranspose(wvp);
@@ -182,19 +192,15 @@ namespace Rendering
 			direct3DDeviceContext->DrawIndexed(mIndexCount, 0, 0);
 		}
 
-		mProxyModel->Draw(gameTime);
+		//mProxyModel->Draw(gameTime);
 		
 		// Draw help text
 		mRenderStateHelper.SaveAll();
 		mSpriteBatch->Begin();
 
 		wostringstream helpLabel;
-		helpLabel << "Ambient Intensity (+PgUp/-PgDn): " << mPSCBufferPerFrameData.AmbientColor.x << "\n";
-		//helpLabel << L"Specular Intensity (+Insert/-Delete): " << mPSCBufferPerObjectData.SpecularColor.x << "\n";
-		//helpLabel << L"Specular Power (+O/-P): " << mPSCBufferPerObjectData.SpecularPower << "\n";
-		helpLabel << L"Point Light Intensity (+Home/-End): " << mPSCBufferPerFrameData.LightColor.x << "\n";
-		helpLabel << L"Point Light Radius (+V/-B): " << mVSCBufferPerFrameData.LightRadius << "\n";
-		helpLabel << L"Move Point Light (8/2, 4/6, 3/9)" << "\n";
+		helpLabel << L"Move(Mouse + WASD)" << "\n";
+		helpLabel << L"Change Camera Speed(Scroll Wheel): " << static_pointer_cast<FirstPersonCamera>(mCamera)->MovementFactor() << "\n";
 		helpLabel << L"Toggle Grid (G)" << "\n";
 		helpLabel << L"Toggle Animation (Space)" << "\n";
 	
@@ -232,128 +238,5 @@ namespace Rendering
 	void SolarSystemRender::ToggleAnimation()
 	{
 		mAnimationEnabled = !mAnimationEnabled;
-	}
-
-	void SolarSystemRender::UpdateAmbientLight(const GameTime& gameTime)
-	{
-		static float ambientIntensity = mPSCBufferPerFrameData.AmbientColor.x;
-
-		assert(mKeyboard != nullptr);
-
-		if (mKeyboard->IsKeyDown(Keys::PageUp) && ambientIntensity < 1.0f)
-		{
-			ambientIntensity += gameTime.ElapsedGameTimeSeconds().count();
-			ambientIntensity = min(ambientIntensity, 1.0f);
-
-			mPSCBufferPerFrameData.AmbientColor = XMFLOAT3(ambientIntensity, ambientIntensity, ambientIntensity);
-			mGame->Direct3DDeviceContext()->UpdateSubresource(mPSCBufferPerFrame.Get(), 0, nullptr, &mPSCBufferPerFrameData, 0, 0);
-		}
-		else if (mKeyboard->IsKeyDown(Keys::PageDown) && ambientIntensity > 0.0f)
-		{
-			ambientIntensity -= gameTime.ElapsedGameTimeSeconds().count();
-			ambientIntensity = max(ambientIntensity, 0.0f);
-
-			mPSCBufferPerFrameData.AmbientColor = XMFLOAT3(ambientIntensity, ambientIntensity, ambientIntensity);
-			mGame->Direct3DDeviceContext()->UpdateSubresource(mPSCBufferPerFrame.Get(), 0, nullptr, &mPSCBufferPerFrameData, 0, 0);
-		}
-	}
-
-	void SolarSystemRender::UpdatePointLight(const GameTime& gameTime)
-	{
-		static float lightIntensity = mPSCBufferPerFrameData.LightColor.x;
-
-		assert(mKeyboard != nullptr);
-
-		float elapsedTime = gameTime.ElapsedGameTimeSeconds().count();
-		bool updateCBuffer = false;
-
-		// Update point light intensity
-		if (mKeyboard->IsKeyDown(Keys::Home) && lightIntensity < 1.0f)
-		{
-			lightIntensity += elapsedTime;
-			lightIntensity = min(lightIntensity, 1.0f);
-
-			mPSCBufferPerFrameData.LightColor = XMFLOAT3(lightIntensity, lightIntensity, lightIntensity);
-			mPointLight.SetColor(mPSCBufferPerFrameData.LightColor.x, mPSCBufferPerFrameData.LightColor.y, mPSCBufferPerFrameData.LightColor.z, 1.0f);
-			updateCBuffer = true;
-		}
-		else if (mKeyboard->IsKeyDown(Keys::End) && lightIntensity > 0.0f)
-		{
-			lightIntensity -= elapsedTime;
-			lightIntensity = max(lightIntensity, 0.0f);
-
-			mPSCBufferPerFrameData.LightColor = XMFLOAT3(lightIntensity, lightIntensity, lightIntensity);
-			mPointLight.SetColor(mPSCBufferPerFrameData.LightColor.x, mPSCBufferPerFrameData.LightColor.y, mPSCBufferPerFrameData.LightColor.z, 1.0f);
-			updateCBuffer = true;
-		}
-
-		// Move point light
-		XMFLOAT3 movementAmount = Vector3Helper::Zero;
-		if (mKeyboard != nullptr)
-		{
-			if (mKeyboard->IsKeyDown(Keys::NumPad4))
-			{
-				movementAmount.x = -1.0f;
-			}
-
-			if (mKeyboard->IsKeyDown(Keys::NumPad6))
-			{
-				movementAmount.x = 1.0f;
-			}
-
-			if (mKeyboard->IsKeyDown(Keys::NumPad9))
-			{
-				movementAmount.y = 1.0f;
-			}
-
-			if (mKeyboard->IsKeyDown(Keys::NumPad3))
-			{
-				movementAmount.y = -1.0f;
-			}
-
-			if (mKeyboard->IsKeyDown(Keys::NumPad8))
-			{
-				movementAmount.z = -1.0f;
-			}
-
-			if (mKeyboard->IsKeyDown(Keys::NumPad2))
-			{
-				movementAmount.z = 1.0f;
-			}
-		}
-
-		if (movementAmount.x != 0.0f || movementAmount.y != 0.0f || movementAmount.z != 0.0f)
-		{
-			XMVECTOR movement = XMLoadFloat3(&movementAmount) * LightMovementRate * elapsedTime;
-			mPointLight.SetPosition(mPointLight.PositionVector() + movement);
-			mProxyModel->SetPosition(mPointLight.Position());
-			mVSCBufferPerFrameData.LightPosition = mPointLight.Position();
-			mPSCBufferPerFrameData.LightPosition = mPointLight.Position();
-			updateCBuffer = true;
-		}
-
-		// Update the light's radius
-		if (mKeyboard->IsKeyDown(Keys::V))
-		{
-			float radius = mPointLight.Radius() + LightModulationRate * elapsedTime;
-			mPointLight.SetRadius(radius);
-			mVSCBufferPerFrameData.LightRadius = mPointLight.Radius();
-			updateCBuffer = true;
-		}
-
-		if (mKeyboard->IsKeyDown(Keys::B))
-		{
-			float radius = mPointLight.Radius() - LightModulationRate * elapsedTime;
-			radius = max(radius, 0.0f);
-			mPointLight.SetRadius(radius);
-			mVSCBufferPerFrameData.LightRadius = mPointLight.Radius();
-			updateCBuffer = true;
-		}
-
-		if (updateCBuffer)
-		{
-			mGame->Direct3DDeviceContext()->UpdateSubresource(mVSCBufferPerFrame.Get(), 0, nullptr, &mVSCBufferPerFrameData, 0, 0);
-			mGame->Direct3DDeviceContext()->UpdateSubresource(mPSCBufferPerFrame.Get(), 0, nullptr, &mPSCBufferPerFrameData, 0, 0);
-		}
 	}
 }

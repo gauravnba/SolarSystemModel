@@ -96,8 +96,6 @@ namespace Rendering
 
 		void CreateVertexBuffer(const Library::Mesh& mesh, ID3D11Buffer** vertexBuffer) const;
 		void ToggleAnimation();
-		void UpdateAmbientLight(const Library::GameTime& gameTime);
-		void UpdatePointLight(const Library::GameTime& gameTime);
 		static const float LightModulationRate;
 		static const float LightMovementRate;
 
@@ -109,6 +107,7 @@ namespace Rendering
 		Library::RenderStateHelper mRenderStateHelper;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> mSunShader;
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> mInputLayout;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mVertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mIndexBuffer;
@@ -116,7 +115,6 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mVSCBufferPerObject;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mPSCBufferPerFrame;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mPSCBufferPerObject;
-		std::unique_ptr<Library::ProxyModel> mProxyModel;
 		Library::KeyboardComponent* mKeyboard;
 		std::uint32_t mIndexCount;
 		std::unique_ptr<DirectX::SpriteBatch> mSpriteBatch;

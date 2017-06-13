@@ -9,8 +9,9 @@ namespace SolarSystem
 {
 	RTTI_DEFINITIONS(Planet)
 
-	Planet::Planet(Game* game , float rotation, const wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, Planet* orbitAround) :
-		mRotationRate(rotation), mRevolutionRate(revolutionRate), mWorldMatrix(MatrixHelper::Identity), mAxialTilt(axialTilt), mOrbitAround(orbitAround), mRotation(0.0f), mRevolution(0.0f), mOrbit(orbitalDistance)
+	Planet::Planet(Game* game , float rotation, const wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, Planet* orbitAround, bool isLit) :
+		mRotationRate(rotation), mRevolutionRate(revolutionRate), mWorldMatrix(MatrixHelper::Identity), mAxialTilt(axialTilt), mParent(orbitAround), 
+		mRotation(0.0f), mRevolution(0.0f), mOrbit(orbitalDistance), mIsLit(isLit)
 	{
 		mScale = XMMatrixScaling(scale, scale, scale);
 		mOrbitalDistance = XMMatrixTranslation(orbitalDistance, 0.0f, 0.0f);
@@ -38,20 +39,26 @@ namespace SolarSystem
 		return mColorTexture;
 	}
 
+	bool Planet::IsLit()
+	{
+		return mIsLit;
+	}
+
 	void Planet::Update(const Library::GameTime& gameTime)
 	{
 			mRotation += gameTime.ElapsedGameTimeSeconds().count() * mRotationRate;
 			mRevolution += gameTime.ElapsedGameTimeSeconds().count() * mRevolutionRate;
 			
-			if (mOrbitAround == nullptr)
+			if (mParent == nullptr)
 			{
 				XMStoreFloat4x4(&mWorldMatrix, mScale * XMMatrixRotationY(mRotation) * XMMatrixRotationZ(mAxialTilt) * mOrbitalDistance * XMMatrixRotationY(mRevolution));
 			}
 
 			else
 			{
-				float angle = mOrbitAround->mRevolution;
-				XMStoreFloat4x4(&mWorldMatrix, mScale * XMMatrixRotationY(mRotation) * XMMatrixRotationZ(mAxialTilt) * mOrbitalDistance * XMMatrixRotationY(mRevolution) * XMMatrixTranslation(mOrbitAround->mOrbit * XMScalarCos(angle), 0.0f, mOrbitAround->mOrbit * XMScalarSin(angle) * -1.0f));
+				XMFLOAT3 parentPosition;
+				MatrixHelper::GetTranslation(XMLoadFloat4x4(&mParent->mWorldMatrix), parentPosition);
+				XMStoreFloat4x4(&mWorldMatrix, mScale * XMMatrixRotationY(mRotation) * XMMatrixRotationZ(mAxialTilt) * mOrbitalDistance * XMMatrixRotationY(mRevolution) * XMMatrixTranslation(parentPosition.x, parentPosition.y, parentPosition.z));
 			}
 	}
 }
