@@ -7,37 +7,37 @@ using namespace SolarSystem;
 
 namespace Rendering
 {
-	RTTI_DEFINITIONS(PointLightDemo)
+	RTTI_DEFINITIONS(SolarSystemRender)
 
-	const float PointLightDemo::LightModulationRate = UCHAR_MAX;
-	const float PointLightDemo::LightMovementRate = 10.0f;
+	const float SolarSystemRender::LightModulationRate = UCHAR_MAX;
+	const float SolarSystemRender::LightMovementRate = 10.0f;
 
-	PointLightDemo::PointLightDemo(Game& game, const shared_ptr<Camera>& camera) :
-		DrawableGameComponent(game, camera), mPointLight(game, XMFLOAT3(0.0f, 0.0f, 0.0f), 1000.0f),
+	SolarSystemRender::SolarSystemRender(Game& game, const shared_ptr<Camera>& camera) :
+		DrawableGameComponent(game, camera), mPointLight(game, XMFLOAT3(0.0f, 0.0f, 0.0f), 25000.0f),
 		mRenderStateHelper(game), mIndexCount(0), mTextPosition(0.0f, 40.0f), mAnimationEnabled(true)
 	{
 	}
 
-	bool PointLightDemo::AnimationEnabled() const
+	bool SolarSystemRender::AnimationEnabled() const
 	{
 		return mAnimationEnabled;
 	}
 
-	void PointLightDemo::SetAnimationEnabled(bool enabled)
+	void SolarSystemRender::SetAnimationEnabled(bool enabled)
 	{
 		mAnimationEnabled = enabled;
 	}
 
-	void PointLightDemo::Initialize()
+	void SolarSystemRender::Initialize()
 	{
 		// Load a compiled vertex shader
 		vector<char> compiledVertexShader;
-		Utility::LoadBinaryFile(L"Content\\Shaders\\PointLightDemoVS.cso", compiledVertexShader);
+		Utility::LoadBinaryFile(L"Content\\Shaders\\SolarSystemVS.cso", compiledVertexShader);
 		ThrowIfFailed(mGame->Direct3DDevice()->CreateVertexShader(&compiledVertexShader[0], compiledVertexShader.size(), nullptr, mVertexShader.ReleaseAndGetAddressOf()), "ID3D11Device::CreatedVertexShader() failed.");
 
 		// Load a compiled pixel shader
 		vector<char> compiledPixelShader;
-		Utility::LoadBinaryFile(L"Content\\Shaders\\PointLightDemoPS.cso", compiledPixelShader);
+		Utility::LoadBinaryFile(L"Content\\Shaders\\SolarSystemPS.cso", compiledPixelShader);
 		ThrowIfFailed(mGame->Direct3DDevice()->CreatePixelShader(&compiledPixelShader[0], compiledPixelShader.size(), nullptr, mPixelShader.ReleaseAndGetAddressOf()), "ID3D11Device::CreatedPixelShader() failed.");
 
 		// Create an input layout
@@ -74,13 +74,6 @@ namespace Rendering
 		constantBufferDesc.ByteWidth = sizeof(PSCBufferPerObject);
 		ThrowIfFailed(mGame->Direct3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, mPSCBufferPerObject.ReleaseAndGetAddressOf()), "ID3D11Device::CreateBuffer() failed.");
 
-		//// Load textures for the color and specular maps
-		//wstring textureName = L"Content\\Textures\\jupiter2_2k.jpg";
-		//ThrowIfFailed(CreateWICTextureFromFile(mGame->Direct3DDevice(), textureName.c_str(), nullptr, mColorTexture.ReleaseAndGetAddressOf()), "CreateDDSTextureFromFile() failed.");
-
-		//textureName = L"Content\\Textures\\EarthSpecularMap.png";
-		//ThrowIfFailed(CreateWICTextureFromFile(mGame->Direct3DDevice(), textureName.c_str(), nullptr, mSpecularMap.ReleaseAndGetAddressOf()), "CreateWICTextureFromFile() failed.");
-
 		// Create text rendering helpers
 		mSpriteBatch = make_unique<SpriteBatch>(mGame->Direct3DDeviceContext());
 		mSpriteFont = make_unique<SpriteFont>(mGame->Direct3DDevice(), L"Content\\Fonts\\Arial_14_Regular.spritefont");
@@ -103,19 +96,25 @@ namespace Rendering
 		mProxyModel->Initialize();
 		mProxyModel->SetPosition(mPointLight.Position());
 
-		const float earthRotation = XM_PI;
+		const float earthRotation = XM_PI * 5;
 		const float earthAxialTilt = 0.4101524f;
-		const float earthOrbitalDistance = 200.0f;
 		const float earthScale = 1.0f;
+		const float earthOrbitalDistance = 200.0f;
 		const float earthRevolution = earthRotation / 365;
 
-		mPlanetList.push_back(Planet(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 0.241f, nullptr));
+		mPlanetList.push_back(Planet(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 4.149f, nullptr));
+		mPlanetList.push_back(Planet(mGame, earthRotation * 0.004f, L"Content\\Textures\\venusmap.jpg", earthAxialTilt * 0.959f, earthOrbitalDistance * 0.723f, earthScale * 0.949f, earthRevolution * 1.624f, nullptr));
 		mPlanetList.push_back(Planet(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr));
-		//mPlanetList.push_back(Planet(mGame, earthRotation, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance, earthScale / 27, earthRotation * 30, nullptr));
-		
+		mPlanetList.push_back(Planet(mGame, earthRotation, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.002f, earthScale / 27, earthRevolution / 12, &mPlanetList[2]));
+		mPlanetList.push_back(Planet(mGame, earthRotation, L"Content\\Textures\\marsmap1k.jpg", 0.4392f, earthOrbitalDistance * 1.524f, earthScale * 0.532f, earthRevolution * 0.531f, nullptr));
+		mPlanetList.push_back(Planet(mGame, earthRotation * 2.4f, L"Content\\Textures\\jupiter2_2k.jpg", 0.05352f, earthOrbitalDistance * 5.203f, earthScale * 11.19f, earthRevolution * 0.084f, nullptr));
+		mPlanetList.push_back(Planet(mGame, earthRotation * 2.3f, L"Content\\Textures\\saturnmap.jpg", 0.4712f, earthOrbitalDistance * 9.582f, earthScale * 9.26f, earthRevolution * 0.034f, nullptr));
+		mPlanetList.push_back(Planet(mGame, earthRotation * 1.39f, L"Content\\Textures\\uranusmap.jpg", 1.6927f, earthOrbitalDistance * 19.20f, earthScale * 4.01f, earthRevolution * 0.011f, nullptr));
+		mPlanetList.push_back(Planet(mGame, earthRotation * 1.489f, L"Content\\Textures\\neptunemap.jpg", 0.5166f, earthOrbitalDistance * 30.5f, earthScale * 3.88f, earthRevolution * 0.0061f, nullptr));
+		mPlanetList.push_back(Planet(mGame, earthRotation * 0.156f, L"Content\\Textures\\plutomap2k.jpg", 2.129f, earthOrbitalDistance * 39.48f, earthScale * 0.18f, earthRevolution * 0.004f, nullptr));
 	}
 
-	void PointLightDemo::Update(const GameTime& gameTime)
+	void SolarSystemRender::Update(const GameTime& gameTime)
 	{
 		if (mAnimationEnabled)
 		{
@@ -134,13 +133,12 @@ namespace Rendering
 
 			UpdateAmbientLight(gameTime);
 			UpdatePointLight(gameTime);
-			UpdateSpecularLight(gameTime);
 		}
 
 		mProxyModel->Update(gameTime);
 	}
 
-	void PointLightDemo::Draw(const GameTime& gameTime)
+	void SolarSystemRender::Draw(const GameTime& gameTime)
 	{
 		UNREFERENCED_PARAMETER(gameTime);
 		assert(mCamera != nullptr);
@@ -165,24 +163,22 @@ namespace Rendering
 			XMStoreFloat4x4(&mVSCBufferPerObjectData.WorldViewProjection, wvp);
 			XMStoreFloat4x4(&mVSCBufferPerObjectData.World, XMMatrixTranspose(worldMatrix));
 			direct3DDeviceContext->UpdateSubresource(mVSCBufferPerObject.Get(), 0, nullptr, &mVSCBufferPerObjectData, 0, 0);
-		}
 
-		ID3D11Buffer* VSConstantBuffers[] = { mVSCBufferPerFrame.Get(), mVSCBufferPerObject.Get() };
-		direct3DDeviceContext->VSSetConstantBuffers(0, ARRAYSIZE(VSConstantBuffers), VSConstantBuffers);
+			ID3D11Buffer* VSConstantBuffers[] = { mVSCBufferPerFrame.Get(), mVSCBufferPerObject.Get() };
+			direct3DDeviceContext->VSSetConstantBuffers(0, ARRAYSIZE(VSConstantBuffers), VSConstantBuffers);
 
-		mPSCBufferPerFrameData.CameraPosition = mCamera->Position();
-		direct3DDeviceContext->UpdateSubresource(mPSCBufferPerFrame.Get(), 0, nullptr, &mPSCBufferPerFrameData, 0, 0);
+			mPSCBufferPerFrameData.CameraPosition = mCamera->Position();
+			direct3DDeviceContext->UpdateSubresource(mPSCBufferPerFrame.Get(), 0, nullptr, &mPSCBufferPerFrameData, 0, 0);
 
-		ID3D11Buffer* PSConstantBuffers[] = { mPSCBufferPerFrame.Get(), mPSCBufferPerObject.Get() };
-		direct3DDeviceContext->PSSetConstantBuffers(0, ARRAYSIZE(PSConstantBuffers), PSConstantBuffers);
-		for (uint32_t i = 0; i < mPlanetList.size(); ++i)
-		{
+			ID3D11Buffer* PSConstantBuffers[] = { mPSCBufferPerFrame.Get(), mPSCBufferPerObject.Get() };
+			direct3DDeviceContext->PSSetConstantBuffers(0, ARRAYSIZE(PSConstantBuffers), PSConstantBuffers);
+
 			ID3D11ShaderResourceView* PSShaderResources[] = { mPlanetList[i].ColorTexture().Get() };
 			direct3DDeviceContext->PSSetShaderResources(0, ARRAYSIZE(PSShaderResources), PSShaderResources);
 			direct3DDeviceContext->PSSetSamplers(0, 1, SamplerStates::TrilinearWrap.GetAddressOf());
-		}
 
-		direct3DDeviceContext->DrawIndexed(mIndexCount, 0, 0);
+			direct3DDeviceContext->DrawIndexed(mIndexCount, 0, 0);
+		}
 
 		mProxyModel->Draw(gameTime);
 		
@@ -192,8 +188,8 @@ namespace Rendering
 
 		wostringstream helpLabel;
 		helpLabel << "Ambient Intensity (+PgUp/-PgDn): " << mPSCBufferPerFrameData.AmbientColor.x << "\n";
-		helpLabel << L"Specular Intensity (+Insert/-Delete): " << mPSCBufferPerObjectData.SpecularColor.x << "\n";
-		helpLabel << L"Specular Power (+O/-P): " << mPSCBufferPerObjectData.SpecularPower << "\n";
+		//helpLabel << L"Specular Intensity (+Insert/-Delete): " << mPSCBufferPerObjectData.SpecularColor.x << "\n";
+		//helpLabel << L"Specular Power (+O/-P): " << mPSCBufferPerObjectData.SpecularPower << "\n";
 		helpLabel << L"Point Light Intensity (+Home/-End): " << mPSCBufferPerFrameData.LightColor.x << "\n";
 		helpLabel << L"Point Light Radius (+V/-B): " << mVSCBufferPerFrameData.LightRadius << "\n";
 		helpLabel << L"Move Point Light (8/2, 4/6, 3/9)" << "\n";
@@ -205,7 +201,7 @@ namespace Rendering
 		mRenderStateHelper.RestoreAll();
 	}
 
-	void PointLightDemo::CreateVertexBuffer(const Mesh& mesh, ID3D11Buffer** vertexBuffer) const
+	void SolarSystemRender::CreateVertexBuffer(const Mesh& mesh, ID3D11Buffer** vertexBuffer) const
 	{
 		const vector<XMFLOAT3>& sourceVertices = mesh.Vertices();
 		const vector<XMFLOAT3>& sourceNormals = mesh.Normals();
@@ -231,12 +227,12 @@ namespace Rendering
 		ThrowIfFailed(mGame->Direct3DDevice()->CreateBuffer(&vertexBufferDesc, &vertexSubResourceData, vertexBuffer), "ID3D11Device::CreateBuffer() failed.");
 	}
 
-	void PointLightDemo::ToggleAnimation()
+	void SolarSystemRender::ToggleAnimation()
 	{
 		mAnimationEnabled = !mAnimationEnabled;
 	}
 
-	void PointLightDemo::UpdateAmbientLight(const GameTime& gameTime)
+	void SolarSystemRender::UpdateAmbientLight(const GameTime& gameTime)
 	{
 		static float ambientIntensity = mPSCBufferPerFrameData.AmbientColor.x;
 
@@ -260,7 +256,7 @@ namespace Rendering
 		}
 	}
 
-	void PointLightDemo::UpdatePointLight(const GameTime& gameTime)
+	void SolarSystemRender::UpdatePointLight(const GameTime& gameTime)
 	{
 		static float lightIntensity = mPSCBufferPerFrameData.LightColor.x;
 
@@ -353,58 +349,9 @@ namespace Rendering
 		}
 
 		if (updateCBuffer)
-		{			
+		{
 			mGame->Direct3DDeviceContext()->UpdateSubresource(mVSCBufferPerFrame.Get(), 0, nullptr, &mVSCBufferPerFrameData, 0, 0);
 			mGame->Direct3DDeviceContext()->UpdateSubresource(mPSCBufferPerFrame.Get(), 0, nullptr, &mPSCBufferPerFrameData, 0, 0);
-		}
-	}
-
-	void PointLightDemo::UpdateSpecularLight(const GameTime& gameTime)
-	{
-		static float specularIntensity = mPSCBufferPerObjectData.SpecularColor.x;
-		bool updateCBuffer = false;
-
-		if (mKeyboard->IsKeyDown(Keys::Insert) && specularIntensity < 1.0f)
-		{
-			specularIntensity += gameTime.ElapsedGameTimeSeconds().count();
-			specularIntensity = min(specularIntensity, 1.0f);
-
-			mPSCBufferPerObjectData.SpecularColor = XMFLOAT3(specularIntensity, specularIntensity, specularIntensity);
-			updateCBuffer = true;
-		}
-
-		if (mKeyboard->IsKeyDown(Keys::Delete) && specularIntensity > 0.0f)
-		{
-			specularIntensity -= gameTime.ElapsedGameTimeSeconds().count();
-			specularIntensity = max(specularIntensity, 0.0f);
-
-			mPSCBufferPerObjectData.SpecularColor = XMFLOAT3(specularIntensity, specularIntensity, specularIntensity);
-			updateCBuffer = true;
-		}
-
-		static float specularPower = mPSCBufferPerObjectData.SpecularPower;
-
-		if (mKeyboard->IsKeyDown(Keys::O) && specularPower < UCHAR_MAX)
-		{
-			specularPower += LightModulationRate * gameTime.ElapsedGameTimeSeconds().count();
-			specularPower = min(specularPower, static_cast<float>(UCHAR_MAX));
-
-			mPSCBufferPerObjectData.SpecularPower = specularPower;
-			updateCBuffer = true;
-		}
-
-		if (mKeyboard->IsKeyDown(Keys::P) && specularPower > 1.0f)
-		{
-			specularPower -= LightModulationRate * gameTime.ElapsedGameTimeSeconds().count();
-			specularPower = max(specularPower, 1.0f);
-
-			mPSCBufferPerObjectData.SpecularPower = specularPower;
-			updateCBuffer = true;
-		}
-
-		if (updateCBuffer)
-		{
-			mGame->Direct3DDeviceContext()->UpdateSubresource(mPSCBufferPerObject.Get(), 0, nullptr, &mPSCBufferPerObjectData, 0, 0);
 		}
 	}
 }

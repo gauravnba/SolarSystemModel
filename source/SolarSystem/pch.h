@@ -86,4 +86,4 @@
 
 // Local
 #include "RenderingGame.h"
-#include "PointLightDemo.h"
+#include "SolarSystemRender.h"

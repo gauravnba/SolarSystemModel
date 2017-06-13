@@ -21,11 +21,12 @@ namespace SolarSystem
 		float mRotationRate;
 		float mRevolutionRate;
 		float mAxialTilt;
+		float mRotation;
+		float mRevolution;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mColorTexture;
 		DirectX::XMFLOAT4X4 mWorldMatrix;
 		DirectX::XMMATRIX mScale;
 		DirectX::XMMATRIX mOrbitalDistance;
-		DirectX::XMVECTOR mAxis;
 		Planet* mOrbitAround;
 	};
 }

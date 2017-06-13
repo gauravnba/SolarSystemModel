@@ -13,7 +13,6 @@ cbuffer CBufferPerObject
 }
 
 Texture2D ColorMap;
-Texture2D SpecularMap;
 SamplerState TextureSampler;
 
 struct VS_OUTPUT
@@ -36,12 +35,10 @@ float4 main(VS_OUTPUT IN) : SV_TARGET
 	float n_dot_h = dot(normal, halfVector);
 
 	float4 color = ColorMap.Sample(TextureSampler, IN.TextureCoordinate);
-	float specularClamp = SpecularMap.Sample(TextureSampler, IN.TextureCoordinate).x;
 	float2 lightCoefficients = lit(n_dot_l, n_dot_h, SpecularPower).yz;
 
 	float3 ambient = color.rgb * AmbientColor;
 	float3 diffuse = color.rgb * lightCoefficients.x * LightColor * IN.Attenuation;
-	float3 specular = min(lightCoefficients.y, specularClamp) * SpecularColor * IN.Attenuation;
 
-	return float4(saturate(ambient + diffuse + specular), color.a);
+	return float4(saturate(ambient + diffuse), color.a);
 }

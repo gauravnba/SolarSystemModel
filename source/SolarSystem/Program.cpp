@@ -6,7 +6,7 @@ using namespace std;
 
 void Shutdown(const wstring& className);
 
-const SIZE RenderTargetSize = { 1024, 768 };
+const SIZE RenderTargetSize = { 1280, 960 };
 HWND mWindowHandle;
 WNDCLASSEX mWindow;
 unique_ptr<RenderingGame> mGame;
@@ -25,7 +25,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR command
 	ThrowIfFailed(CoInitializeEx(nullptr, COINITBASE_MULTITHREADED), "Error initializing COM.");
 
 	static const wstring windowClassName = L"RenderingClass";
-	static const wstring windowTitle = L"DirectX Essentials";
+	static const wstring windowTitle = L"Solar System";
 
 	UtilityWin32::InitializeWindow(mWindow, mWindowHandle, instance, windowClassName, windowTitle, RenderTargetSize, showCommand);
 
