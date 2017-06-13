@@ -95,22 +95,22 @@ namespace Library
 			{				
 				if (mKeyboard->IsKeyDown(Keys::W))
 				{
-					movementAmount.y = 5.0f;
+					movementAmount.y = 3.0f;
 					positionChanged = true;
 				}
 				if (mKeyboard->IsKeyDown(Keys::S))
 				{
-					movementAmount.y = -5.0f;
+					movementAmount.y = -3.0f;
 					positionChanged = true;
 				}
 				if (mKeyboard->IsKeyDown(Keys::A))
 				{
-					movementAmount.x = -5.0f;
+					movementAmount.x = -3.0f;
 					positionChanged = true;
 				}
 				if (mKeyboard->IsKeyDown(Keys::D))
 				{
-					movementAmount.x = 5.0f;
+					movementAmount.x = 3.0f;
 					positionChanged = true;
 				}
 			}

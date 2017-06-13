@@ -122,7 +122,7 @@ namespace Rendering
 		std::unique_ptr<DirectX::SpriteBatch> mSpriteBatch;
 		std::unique_ptr<DirectX::SpriteFont> mSpriteFont;
 		DirectX::XMFLOAT2 mTextPosition;
-		std::vector<SolarSystem::Planet> mPlanetList;
+		std::vector<std::unique_ptr<SolarSystem::Planet>> mPlanetList;
 		bool mAnimationEnabled;
 	};
 }

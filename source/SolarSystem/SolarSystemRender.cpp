@@ -96,22 +96,24 @@ namespace Rendering
 		mProxyModel->Initialize();
 		mProxyModel->SetPosition(mPointLight.Position());
 
+		// Earth properties declarations
 		const float earthRotation = XM_PI * 5;
 		const float earthAxialTilt = 0.4101524f;
 		const float earthScale = 1.0f;
 		const float earthOrbitalDistance = 200.0f;
 		const float earthRevolution = earthRotation / 365;
 
-		mPlanetList.push_back(Planet(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 4.149f, nullptr));
-		mPlanetList.push_back(Planet(mGame, earthRotation * 0.004f, L"Content\\Textures\\venusmap.jpg", earthAxialTilt * 0.959f, earthOrbitalDistance * 0.723f, earthScale * 0.949f, earthRevolution * 1.624f, nullptr));
-		mPlanetList.push_back(Planet(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr));
-		mPlanetList.push_back(Planet(mGame, earthRotation, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.002f, earthScale / 27, earthRevolution / 12, &mPlanetList[2]));
-		mPlanetList.push_back(Planet(mGame, earthRotation, L"Content\\Textures\\marsmap1k.jpg", 0.4392f, earthOrbitalDistance * 1.524f, earthScale * 0.532f, earthRevolution * 0.531f, nullptr));
-		mPlanetList.push_back(Planet(mGame, earthRotation * 2.4f, L"Content\\Textures\\jupiter2_2k.jpg", 0.05352f, earthOrbitalDistance * 5.203f, earthScale * 11.19f, earthRevolution * 0.084f, nullptr));
-		mPlanetList.push_back(Planet(mGame, earthRotation * 2.3f, L"Content\\Textures\\saturnmap.jpg", 0.4712f, earthOrbitalDistance * 9.582f, earthScale * 9.26f, earthRevolution * 0.034f, nullptr));
-		mPlanetList.push_back(Planet(mGame, earthRotation * 1.39f, L"Content\\Textures\\uranusmap.jpg", 1.6927f, earthOrbitalDistance * 19.20f, earthScale * 4.01f, earthRevolution * 0.011f, nullptr));
-		mPlanetList.push_back(Planet(mGame, earthRotation * 1.489f, L"Content\\Textures\\neptunemap.jpg", 0.5166f, earthOrbitalDistance * 30.5f, earthScale * 3.88f, earthRevolution * 0.0061f, nullptr));
-		mPlanetList.push_back(Planet(mGame, earthRotation * 0.156f, L"Content\\Textures\\plutomap2k.jpg", 2.129f, earthOrbitalDistance * 39.48f, earthScale * 0.18f, earthRevolution * 0.004f, nullptr));
+		// Populate the planet list
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 4.149f, nullptr)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.004f, L"Content\\Textures\\venusmap.jpg", earthAxialTilt * 0.959f, earthOrbitalDistance * 0.723f, earthScale * 0.949f, earthRevolution * 1.624f, nullptr)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation, L"Content\\Textures\\marsmap1k.jpg", 0.4392f, earthOrbitalDistance * 1.524f, earthScale * 0.532f, earthRevolution * 0.531f, nullptr)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 2.4f, L"Content\\Textures\\jupiter2_2k.jpg", 0.05352f, earthOrbitalDistance * 5.203f, earthScale * 11.19f, earthRevolution * 0.084f, nullptr)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 2.3f, L"Content\\Textures\\saturnmap.jpg", 0.4712f, earthOrbitalDistance * 9.582f, earthScale * 9.26f, earthRevolution * 0.034f, nullptr)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 1.39f, L"Content\\Textures\\uranusmap.jpg", 1.6927f, earthOrbitalDistance * 19.20f, earthScale * 4.01f, earthRevolution * 0.011f, nullptr)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 1.489f, L"Content\\Textures\\neptunemap.jpg", 0.5166f, earthOrbitalDistance * 30.5f, earthScale * 3.88f, earthRevolution * 0.0061f, nullptr)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.156f, L"Content\\Textures\\plutomap2k.jpg", 2.129f, earthOrbitalDistance * 39.48f, earthScale * 0.18f, earthRevolution * 0.004f, nullptr)));
+		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRevolution * 12, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.05f, earthScale/ 20, earthRevolution * 12, mPlanetList[2].get())));
 	}
 
 	void SolarSystemRender::Update(const GameTime& gameTime)
@@ -120,7 +122,7 @@ namespace Rendering
 		{
 			for (uint32_t i = 0; i < mPlanetList.size(); ++i)
 			{
-				mPlanetList[i].Update(gameTime);
+				mPlanetList[i]->Update(gameTime);
 			}
 		}
 
@@ -157,7 +159,7 @@ namespace Rendering
 
 		for (uint32_t i = 0; i < mPlanetList.size(); ++i)
 		{
-			XMMATRIX worldMatrix = mPlanetList[i].WorldMatrix();
+			XMMATRIX worldMatrix = mPlanetList[i]->WorldMatrix();
 			XMMATRIX wvp = worldMatrix * mCamera->ViewProjectionMatrix();
 			wvp = XMMatrixTranspose(wvp);
 			XMStoreFloat4x4(&mVSCBufferPerObjectData.WorldViewProjection, wvp);
@@ -173,7 +175,7 @@ namespace Rendering
 			ID3D11Buffer* PSConstantBuffers[] = { mPSCBufferPerFrame.Get(), mPSCBufferPerObject.Get() };
 			direct3DDeviceContext->PSSetConstantBuffers(0, ARRAYSIZE(PSConstantBuffers), PSConstantBuffers);
 
-			ID3D11ShaderResourceView* PSShaderResources[] = { mPlanetList[i].ColorTexture().Get() };
+			ID3D11ShaderResourceView* PSShaderResources[] = { mPlanetList[i]->ColorTexture().Get() };
 			direct3DDeviceContext->PSSetShaderResources(0, ARRAYSIZE(PSShaderResources), PSShaderResources);
 			direct3DDeviceContext->PSSetSamplers(0, 1, SamplerStates::TrilinearWrap.GetAddressOf());
 
