@@ -11,22 +11,21 @@ namespace SolarSystem
 		RTTI_DECLARATIONS(Planet, Library::GameComponent)
 
 	public:
-		Planet(float rotation, const std::wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate);
-
-		void ToggleAnimation();
-
-		virtual void Initialize() override;
+		Planet(Library::Game* game, float rotation, const std::wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, Planet* orbitAround);
 		virtual void Update(const Library::GameTime& gameTime) override;
 
 		DirectX::XMMATRIX WorldMatrix();
-		std::wstring TextureString();
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ColorTexture();
 
 	private:
 		float mRotationRate;
 		float mRevolutionRate;
-		DirectX::XMMATRIX mWorldMatrix;
-		std::wstring mTextureString;
+		float mAxialTilt;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mColorTexture;
+		DirectX::XMFLOAT4X4 mWorldMatrix;
+		DirectX::XMMATRIX mScale;
+		DirectX::XMMATRIX mOrbitalDistance;
 		DirectX::XMVECTOR mAxis;
-		bool mAnimationEnabled;
+		Planet* mOrbitAround;
 	};
 }

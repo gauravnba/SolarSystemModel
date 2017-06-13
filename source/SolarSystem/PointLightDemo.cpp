@@ -3,18 +3,18 @@
 using namespace std;
 using namespace Library;
 using namespace DirectX;
+using namespace SolarSystem;
 
 namespace Rendering
 {
 	RTTI_DEFINITIONS(PointLightDemo)
 
-	const float PointLightDemo::ModelRotationRate = XM_PI/4;
 	const float PointLightDemo::LightModulationRate = UCHAR_MAX;
 	const float PointLightDemo::LightMovementRate = 10.0f;
 
-	PointLightDemo::PointLightDemo(Game& game, const shared_ptr<Camera>& camera, const XMMATRIX& position, const XMMATRIX& scale) :
-		DrawableGameComponent(game, camera), mWorldMatrix(MatrixHelper::Identity), mPointLight(game, XMFLOAT3(0.0f, 0.0f, 0.0f), 1000.0f),
-		mRenderStateHelper(game), mIndexCount(0), mTextPosition(0.0f, 40.0f), mAnimationEnabled(false), mTranslate(position), mScale(scale)
+	PointLightDemo::PointLightDemo(Game& game, const shared_ptr<Camera>& camera) :
+		DrawableGameComponent(game, camera), mPointLight(game, XMFLOAT3(0.0f, 0.0f, 0.0f), 1000.0f),
+		mRenderStateHelper(game), mIndexCount(0), mTextPosition(0.0f, 40.0f), mAnimationEnabled(true)
 	{
 	}
 
@@ -74,12 +74,12 @@ namespace Rendering
 		constantBufferDesc.ByteWidth = sizeof(PSCBufferPerObject);
 		ThrowIfFailed(mGame->Direct3DDevice()->CreateBuffer(&constantBufferDesc, nullptr, mPSCBufferPerObject.ReleaseAndGetAddressOf()), "ID3D11Device::CreateBuffer() failed.");
 
-		// Load textures for the color and specular maps
-		wstring textureName = L"Content\\Textures\\jupiter2_2k.jpg";
-		ThrowIfFailed(CreateWICTextureFromFile(mGame->Direct3DDevice(), textureName.c_str(), nullptr, mColorTexture.ReleaseAndGetAddressOf()), "CreateDDSTextureFromFile() failed.");
+		//// Load textures for the color and specular maps
+		//wstring textureName = L"Content\\Textures\\jupiter2_2k.jpg";
+		//ThrowIfFailed(CreateWICTextureFromFile(mGame->Direct3DDevice(), textureName.c_str(), nullptr, mColorTexture.ReleaseAndGetAddressOf()), "CreateDDSTextureFromFile() failed.");
 
-		/*textureName = L"Content\\Textures\\EarthSpecularMap.png";
-		ThrowIfFailed(CreateWICTextureFromFile(mGame->Direct3DDevice(), textureName.c_str(), nullptr, mSpecularMap.ReleaseAndGetAddressOf()), "CreateWICTextureFromFile() failed.");*/
+		//textureName = L"Content\\Textures\\EarthSpecularMap.png";
+		//ThrowIfFailed(CreateWICTextureFromFile(mGame->Direct3DDevice(), textureName.c_str(), nullptr, mSpecularMap.ReleaseAndGetAddressOf()), "CreateWICTextureFromFile() failed.");
 
 		// Create text rendering helpers
 		mSpriteBatch = make_unique<SpriteBatch>(mGame->Direct3DDeviceContext());
@@ -103,21 +103,26 @@ namespace Rendering
 		mProxyModel->Initialize();
 		mProxyModel->SetPosition(mPointLight.Position());
 
-		//Initialize the axis
-		XMFLOAT4 temp(0.0f, 1.0f, 0.0f, 0.0f);
-		mAxis = XMVector4Transform(XMLoadFloat4(&temp), XMMatrixRotationZ(-0.4101524f));
+		const float earthRotation = XM_PI;
+		const float earthAxialTilt = 0.4101524f;
+		const float earthOrbitalDistance = 200.0f;
+		const float earthScale = 1.0f;
+		const float earthRevolution = earthRotation / 365;
+
+		mPlanetList.push_back(Planet(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 0.241f, nullptr));
+		mPlanetList.push_back(Planet(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr));
+		//mPlanetList.push_back(Planet(mGame, earthRotation, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance, earthScale / 27, earthRotation * 30, nullptr));
+		
 	}
 
 	void PointLightDemo::Update(const GameTime& gameTime)
 	{
-		static float angle = 0.0f;
-
 		if (mAnimationEnabled)
 		{
-			angle += gameTime.ElapsedGameTimeSeconds().count() * ModelRotationRate;
-			XMFLOAT4 temp(0.0f, 1.0f, 0.0f, 0.0f);
-
-			XMStoreFloat4x4(&mWorldMatrix, /*mScale * XMMatrixRotationZ(-0.4101524f) **/ XMMatrixRotationAxis(mAxis, angle) * mTranslate * XMMatrixRotationY(angle));
+			for (uint32_t i = 0; i < mPlanetList.size(); ++i)
+			{
+				mPlanetList[i].Update(gameTime);
+			}
 		}
 
 		if (mKeyboard != nullptr)
@@ -152,12 +157,15 @@ namespace Rendering
 		direct3DDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
 		direct3DDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
 
-		XMMATRIX worldMatrix = XMLoadFloat4x4(&mWorldMatrix);
-		XMMATRIX wvp = worldMatrix * mCamera->ViewProjectionMatrix();
-		wvp = XMMatrixTranspose(wvp);
-		XMStoreFloat4x4(&mVSCBufferPerObjectData.WorldViewProjection, wvp);
-		XMStoreFloat4x4(&mVSCBufferPerObjectData.World, XMMatrixTranspose(worldMatrix));
-		direct3DDeviceContext->UpdateSubresource(mVSCBufferPerObject.Get(), 0, nullptr, &mVSCBufferPerObjectData, 0, 0);
+		for (uint32_t i = 0; i < mPlanetList.size(); ++i)
+		{
+			XMMATRIX worldMatrix = mPlanetList[i].WorldMatrix();
+			XMMATRIX wvp = worldMatrix * mCamera->ViewProjectionMatrix();
+			wvp = XMMatrixTranspose(wvp);
+			XMStoreFloat4x4(&mVSCBufferPerObjectData.WorldViewProjection, wvp);
+			XMStoreFloat4x4(&mVSCBufferPerObjectData.World, XMMatrixTranspose(worldMatrix));
+			direct3DDeviceContext->UpdateSubresource(mVSCBufferPerObject.Get(), 0, nullptr, &mVSCBufferPerObjectData, 0, 0);
+		}
 
 		ID3D11Buffer* VSConstantBuffers[] = { mVSCBufferPerFrame.Get(), mVSCBufferPerObject.Get() };
 		direct3DDeviceContext->VSSetConstantBuffers(0, ARRAYSIZE(VSConstantBuffers), VSConstantBuffers);
@@ -167,15 +175,17 @@ namespace Rendering
 
 		ID3D11Buffer* PSConstantBuffers[] = { mPSCBufferPerFrame.Get(), mPSCBufferPerObject.Get() };
 		direct3DDeviceContext->PSSetConstantBuffers(0, ARRAYSIZE(PSConstantBuffers), PSConstantBuffers);
-
-		ID3D11ShaderResourceView* PSShaderResources[] = { mColorTexture.Get()/*, mSpecularMap.Get()*/ };
-		direct3DDeviceContext->PSSetShaderResources(0, ARRAYSIZE(PSShaderResources), PSShaderResources);
-		direct3DDeviceContext->PSSetSamplers(0, 1, SamplerStates::TrilinearWrap.GetAddressOf());
+		for (uint32_t i = 0; i < mPlanetList.size(); ++i)
+		{
+			ID3D11ShaderResourceView* PSShaderResources[] = { mPlanetList[i].ColorTexture().Get() };
+			direct3DDeviceContext->PSSetShaderResources(0, ARRAYSIZE(PSShaderResources), PSShaderResources);
+			direct3DDeviceContext->PSSetSamplers(0, 1, SamplerStates::TrilinearWrap.GetAddressOf());
+		}
 
 		direct3DDeviceContext->DrawIndexed(mIndexCount, 0, 0);
 
 		mProxyModel->Draw(gameTime);
-
+		
 		// Draw help text
 		mRenderStateHelper.SaveAll();
 		mSpriteBatch->Begin();

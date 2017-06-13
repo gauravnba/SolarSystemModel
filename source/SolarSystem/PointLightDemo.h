@@ -3,6 +3,7 @@
 #include "DrawableGameComponent.h"
 #include "RenderStateHelper.h"
 #include "PointLight.h"
+#include "Planet.h"
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 
@@ -26,7 +27,7 @@ namespace Rendering
 		RTTI_DECLARATIONS(PointLightDemo, Library::DrawableGameComponent)
 
 	public:
-		PointLightDemo(Library::Game& game, const std::shared_ptr<Library::Camera>& camera, const DirectX::XMMATRIX& position, const DirectX::XMMATRIX& scale);
+		PointLightDemo(Library::Game& game, const std::shared_ptr<Library::Camera>& camera);
 
 		bool AnimationEnabled() const;
 		void SetAnimationEnabled(bool enabled);
@@ -98,16 +99,13 @@ namespace Rendering
 		void UpdateAmbientLight(const Library::GameTime& gameTime);
 		void UpdatePointLight(const Library::GameTime& gameTime);
 		void UpdateSpecularLight(const Library::GameTime& gameTime);
-				
-		static const float ModelRotationRate;
 		static const float LightModulationRate;
 		static const float LightMovementRate;
 
 		PSCBufferPerFrame mPSCBufferPerFrameData;
-		DirectX::XMFLOAT4X4 mWorldMatrix;
 		VSCBufferPerFrame mVSCBufferPerFrameData;
-		VSCBufferPerObject mVSCBufferPerObjectData;		
-		PSCBufferPerObject mPSCBufferPerObjectData;		
+		VSCBufferPerObject mVSCBufferPerObjectData;
+		PSCBufferPerObject mPSCBufferPerObjectData;
 		Library::PointLight mPointLight;
 		Library::RenderStateHelper mRenderStateHelper;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShader;
@@ -119,17 +117,13 @@ namespace Rendering
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mVSCBufferPerObject;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mPSCBufferPerFrame;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mPSCBufferPerObject;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mColorTexture;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mSpecularMap;
 		std::unique_ptr<Library::ProxyModel> mProxyModel;
 		Library::KeyboardComponent* mKeyboard;
 		std::uint32_t mIndexCount;
 		std::unique_ptr<DirectX::SpriteBatch> mSpriteBatch;
 		std::unique_ptr<DirectX::SpriteFont> mSpriteFont;
 		DirectX::XMFLOAT2 mTextPosition;
-		DirectX::XMVECTOR mAxis;
-		DirectX::XMMATRIX mTranslate;
-		DirectX::XMMATRIX mScale;
+		std::vector<SolarSystem::Planet> mPlanetList;
 		bool mAnimationEnabled;
 	};
 }

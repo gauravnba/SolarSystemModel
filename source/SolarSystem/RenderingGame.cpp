@@ -37,11 +37,8 @@ namespace Rendering
 		mGrid = make_shared<Grid>(*this, mCamera);
 		mComponents.push_back(mGrid);
 
-		mPointLightDemo1 = make_shared<PointLightDemo>(*this, mCamera, XMMatrixTranslation(20.0f, 0.0f, 0.0f), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-		mComponents.push_back(mPointLightDemo1);
-
-		mPointLightDemo2 = make_shared<PointLightDemo>(*this, mCamera, XMMatrixTranslation(50.0f, 0.0f, 0.0f), XMMatrixScaling(2.0f, 2.0f, 2.0f));
-		mComponents.push_back(mPointLightDemo2);
+		mPointLightDemo = make_shared<PointLightDemo>(*this, mCamera);
+		mComponents.push_back(mPointLightDemo);
 
 		Game::Initialize();
 
