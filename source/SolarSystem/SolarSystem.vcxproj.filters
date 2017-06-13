@@ -17,15 +17,15 @@
   <ItemGroup>
     <ClCompile Include="RenderingGame.cpp" />
     <ClCompile Include="Program.cpp" />
-    <ClCompile Include="PointLightDemo.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Planet.cpp" />
+    <ClCompile Include="SolarSystemRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RenderingGame.h" />
-    <ClInclude Include="PointLightDemo.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Planet.h" />
+    <ClInclude Include="SolarSystemRender.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Content\Models\PointLightProxy.obj.bin">
@@ -37,10 +37,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Content\Shaders\PointLightDemoPS.hlsl">
+    <FxCompile Include="Content\Shaders\SolarSystemPS.hlsl">
       <Filter>Content\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Content\Shaders\PointLightDemoVS.hlsl">
+    <FxCompile Include="Content\Shaders\SolarSystemVS.hlsl">
       <Filter>Content\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

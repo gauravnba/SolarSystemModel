@@ -22,12 +22,12 @@ namespace DirectX
 
 namespace Rendering
 {
-	class PointLightDemo final : public Library::DrawableGameComponent
+	class SolarSystemRender final : public Library::DrawableGameComponent
 	{
-		RTTI_DECLARATIONS(PointLightDemo, Library::DrawableGameComponent)
+		RTTI_DECLARATIONS(SolarSystemRender, Library::DrawableGameComponent)
 
 	public:
-		PointLightDemo(Library::Game& game, const std::shared_ptr<Library::Camera>& camera);
+		SolarSystemRender(Library::Game& game, const std::shared_ptr<Library::Camera>& camera);
 
 		bool AnimationEnabled() const;
 		void SetAnimationEnabled(bool enabled);
@@ -98,7 +98,6 @@ namespace Rendering
 		void ToggleAnimation();
 		void UpdateAmbientLight(const Library::GameTime& gameTime);
 		void UpdatePointLight(const Library::GameTime& gameTime);
-		void UpdateSpecularLight(const Library::GameTime& gameTime);
 		static const float LightModulationRate;
 		static const float LightMovementRate;
 

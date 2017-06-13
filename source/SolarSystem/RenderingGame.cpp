@@ -36,9 +36,11 @@ namespace Rendering
 
 		mGrid = make_shared<Grid>(*this, mCamera);
 		mComponents.push_back(mGrid);
+		mGrid->SetEnabled(false);
+		mGrid->SetVisible(false);
 
-		mPointLightDemo = make_shared<PointLightDemo>(*this, mCamera);
-		mComponents.push_back(mPointLightDemo);
+		mSolarSystemRender = make_shared<SolarSystemRender>(*this, mCamera);
+		mComponents.push_back(mSolarSystemRender);
 
 		Game::Initialize();
 

@@ -17,7 +17,7 @@ namespace Library
 
 namespace Rendering
 {
-	class PointLightDemo;
+	class SolarSystemRender;
 	class RenderingGame final : public Library::Game
 
 	{
@@ -41,6 +41,6 @@ namespace Rendering
 		std::shared_ptr<Library::FpsComponent> mFpsComponent;
 		std::shared_ptr<Library::Camera> mCamera;
 		std::shared_ptr<Library::Grid> mGrid;
-		std::shared_ptr<PointLightDemo> mPointLightDemo;
+		std::shared_ptr<SolarSystemRender> mSolarSystemRender;
 	};
 }

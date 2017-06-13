@@ -10,11 +10,8 @@ namespace SolarSystem
 	RTTI_DEFINITIONS(Planet)
 
 	Planet::Planet(Game* game , float rotation, const wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, Planet* orbitAround) :
-		mRotationRate(rotation), mRevolutionRate(revolutionRate), mWorldMatrix(MatrixHelper::Identity), mAxialTilt(axialTilt), mOrbitAround(orbitAround)
+		mRotationRate(rotation), mRevolutionRate(revolutionRate), mWorldMatrix(MatrixHelper::Identity), mAxialTilt(axialTilt), mOrbitAround(orbitAround), mRotation(0.0f), mRevolution(0.0f)
 	{
-		XMFLOAT4 temp(0.0f, 1.0f, 0.0f, 0.0f);
-		mAxis = XMVector4Transform(XMLoadFloat4(&temp), XMMatrixRotationZ(axialTilt));
-
 		mScale = XMMatrixScaling(scale, scale, scale);
 		mOrbitalDistance = XMMatrixTranslation(orbitalDistance, 0.0f, 0.0f);
 
@@ -33,23 +30,18 @@ namespace SolarSystem
 
 	void Planet::Update(const Library::GameTime& gameTime)
 	{
-			static float rotation = 0.0f;
-			static float revolution = 0.0f;
-
-			rotation += gameTime.ElapsedGameTimeSeconds().count() * mRotationRate;
-			revolution += gameTime.ElapsedGameTimeSeconds().count() * mRevolutionRate;
-
-			//mAxis = XMVector4Transform(mAxis, XMMatrixRotationY(revolution));
+			mRotation += gameTime.ElapsedGameTimeSeconds().count() * mRotationRate;
+			mRevolution += gameTime.ElapsedGameTimeSeconds().count() * mRevolutionRate;
 			
 			if (mOrbitAround == nullptr)
 			{
-				XMStoreFloat4x4(&mWorldMatrix, mScale * XMMatrixRotationY(rotation) * XMMatrixRotationZ(mAxialTilt) * mOrbitalDistance * XMMatrixRotationY(revolution));
+				XMStoreFloat4x4(&mWorldMatrix, mScale * XMMatrixRotationY(mRotation) * XMMatrixRotationZ(mAxialTilt) * mOrbitalDistance * XMMatrixRotationY(mRevolution));
 			}
 
 			else
 			{
-				//XMMATRIX orbitAround = mOrbitAround->mOrbitalDistance;
-				//XMStoreFloat4x4(&mWorldMatrix, mScale * XMMatrixRotationZ(mAxialTilt) * XMMatrixRotationAxis(mAxis, rotation) * orbitAround * mOrbitalDistance * XMMatrixRotationAxis(mOrbitAround->mAxis, revolution));
+
+				XMStoreFloat4x4(&mWorldMatrix, mScale * XMMatrixRotationY(mRotation) * XMMatrixRotationZ(mAxialTilt) * mOrbitalDistance * XMMatrixRotationY(mRevolution) * XMMatrixTranslationFromVector(translate));
 			}
 	}
 }
