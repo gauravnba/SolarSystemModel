@@ -19,7 +19,7 @@ namespace Library
 		DrawableGameComponent& operator=(const DrawableGameComponent&) = default;
 		DrawableGameComponent(DrawableGameComponent&&) = default;
 		DrawableGameComponent& operator=(DrawableGameComponent&&) = default;
-		virtual ~DrawableGameComponent() = default;		
+		virtual ~DrawableGameComponent() = default;
 
         bool Visible() const;
         void SetVisible(bool visible);

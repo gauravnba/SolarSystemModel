@@ -46,7 +46,7 @@ namespace Library
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> mInputLayout;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mVertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mIndexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mVertexCBufferPerObject;		
+		Microsoft::WRL::ComPtr<ID3D11Buffer> mVertexCBufferPerObject;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mSkyboxTexture;
 		UINT mIndexCount;		
 	};

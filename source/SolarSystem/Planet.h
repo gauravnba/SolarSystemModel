@@ -11,7 +11,7 @@ namespace SolarSystem
 		RTTI_DECLARATIONS(Planet, Library::GameComponent)
 
 	public:
-		Planet(Library::Game* game, float rotation, const std::wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, Planet* orbitAround);
+		Planet(Library::Game* game, float rotation, const std::wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, Planet* orbitAround, bool isLit);
 		virtual void Update(const Library::GameTime& gameTime) override;
 
 		void* operator new(size_t i);
@@ -19,6 +19,7 @@ namespace SolarSystem
 
 		DirectX::XMMATRIX WorldMatrix();
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ColorTexture();
+		bool IsLit();
 
 	private:
 		float mRotationRate;
@@ -31,6 +32,7 @@ namespace SolarSystem
 		DirectX::XMFLOAT4X4 mWorldMatrix;
 		DirectX::XMMATRIX mScale;
 		DirectX::XMMATRIX mOrbitalDistance;
-		Planet* mOrbitAround;
+		Planet* mParent;
+		bool mIsLit;
 	};
 }

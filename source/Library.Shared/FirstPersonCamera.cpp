@@ -4,25 +4,26 @@ using namespace DirectX;
 
 namespace Library
 {
-    RTTI_DEFINITIONS(FirstPersonCamera)
+	RTTI_DEFINITIONS(FirstPersonCamera)
 
-	const float FirstPersonCamera::DefaultMouseSensitivity = 0.1f;
-    const float FirstPersonCamera::DefaultRotationRate = XMConvertToRadians(100.0f);
-    const float FirstPersonCamera::DefaultMovementRate = 100.0f;
+		const float FirstPersonCamera::DefaultMouseSensitivity = 0.1f;
+	const float FirstPersonCamera::DefaultRotationRate = XMConvertToRadians(100.0f);
+	const float FirstPersonCamera::DefaultMovementRate = 100.0f;
+	const float FirstPersonCamera::DefaultMovementFactor = 3.0f;
 
-    FirstPersonCamera::FirstPersonCamera(Game& game) :
+	FirstPersonCamera::FirstPersonCamera(Game& game) :
 		PerspectiveCamera(game),
 		mGamePad(nullptr), mKeyboard(nullptr), mMouse(nullptr), mMouseSensitivity(DefaultMouseSensitivity),
-		mRotationRate(DefaultRotationRate), mMovementRate(DefaultMovementRate)
-    {
-    }
+		mRotationRate(DefaultRotationRate), mMovementRate(DefaultMovementRate), mMovementFactor(DefaultMovementFactor)
+	{
+	}
 
-    FirstPersonCamera::FirstPersonCamera(Game& game, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) :
+	FirstPersonCamera::FirstPersonCamera(Game& game, float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance) :
 		PerspectiveCamera(game, fieldOfView, aspectRatio, nearPlaneDistance, farPlaneDistance),
 		mGamePad(nullptr), mKeyboard(nullptr), mMouse(nullptr), mMouseSensitivity(DefaultMouseSensitivity),
 		mRotationRate(DefaultRotationRate), mMovementRate(DefaultMovementRate)
-    {
-    }
+	{
+	}
 
 	GamePadComponent* FirstPersonCamera::GetGamePad() const
 	{
@@ -59,15 +60,20 @@ namespace Library
 		return mMouseSensitivity;
 	}
 
-    float& FirstPersonCamera::RotationRate()
-    {
-        return mRotationRate;
-    }
+	float& FirstPersonCamera::RotationRate()
+	{
+		return mRotationRate;
+	}
 
-    float& FirstPersonCamera::MovementRate()
-    {
-        return mMovementRate;
-    }
+	float& FirstPersonCamera::MovementRate()
+	{
+		return mMovementRate;
+	}
+
+	float & FirstPersonCamera::MovementFactor()
+	{
+		return mMovementFactor;
+	}
 
 	void FirstPersonCamera::Initialize()
 	{
@@ -78,50 +84,50 @@ namespace Library
 		Camera::Initialize();
 	}
 
-    void FirstPersonCamera::Update(const GameTime& gameTime)
-    {		
+	void FirstPersonCamera::Update(const GameTime& gameTime)
+	{
 		GamePad::State gamePadState;
 		if (IsGamePadConnected(gamePadState))
 		{
 			XMFLOAT2 movementAmount(gamePadState.thumbSticks.leftX, gamePadState.thumbSticks.leftY);
 			XMFLOAT2 rotationAmount(-gamePadState.thumbSticks.rightX, gamePadState.thumbSticks.rightY);
-			UpdatePosition(movementAmount, rotationAmount, gameTime);			
+			UpdatePosition(movementAmount, rotationAmount, gameTime);
 		}
 		else
 		{
 			bool positionChanged = false;
+
+			XMFLOAT2 rotationAmount = Vector2Helper::Zero;
+			if (mMouse != nullptr)
+			{
+				rotationAmount.x = -mMouse->X() * mMouseSensitivity;
+				rotationAmount.y = -mMouse->Y() * mMouseSensitivity;
+				positionChanged = true;
+
+				mMovementFactor = (mMouse->Wheel() * 0.033f);
+			}
+
 			XMFLOAT2 movementAmount = Vector2Helper::Zero;
 			if (mKeyboard != nullptr)
-			{				
+			{
 				if (mKeyboard->IsKeyDown(Keys::W))
 				{
-					movementAmount.y = 3.0f;
+					movementAmount.y = mMovementFactor;
 					positionChanged = true;
 				}
 				if (mKeyboard->IsKeyDown(Keys::S))
 				{
-					movementAmount.y = -3.0f;
+					movementAmount.y = -mMovementFactor;
 					positionChanged = true;
 				}
 				if (mKeyboard->IsKeyDown(Keys::A))
 				{
-					movementAmount.x = -3.0f;
+					movementAmount.x = -mMovementFactor;
 					positionChanged = true;
 				}
 				if (mKeyboard->IsKeyDown(Keys::D))
 				{
-					movementAmount.x = 3.0f;
-					positionChanged = true;
-				}
-			}
-
-			XMFLOAT2 rotationAmount = Vector2Helper::Zero;
-			if (mMouse != nullptr)
-			{				
-				if (mMouse->IsButtonHeldDown(MouseButtons::Left))
-				{
-					rotationAmount.x = -mMouse->X() * mMouseSensitivity;
-					rotationAmount.y = -mMouse->Y() * mMouseSensitivity;
+					movementAmount.x = mMovementFactor;
 					positionChanged = true;
 				}
 			}
@@ -132,8 +138,8 @@ namespace Library
 			}
 		}
 
-        Camera::Update(gameTime);
-    }
+		Camera::Update(gameTime);
+	}
 
 	void FirstPersonCamera::UpdatePosition(const XMFLOAT2& movementAmount, const XMFLOAT2& rotationAmount, const GameTime& gameTime)
 	{
