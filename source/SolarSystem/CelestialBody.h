@@ -6,12 +6,12 @@
 
 namespace SolarSystem
 {
-	class Planet final : public Library::GameComponent
+	class CelestialBody final : public Library::GameComponent
 	{
-		RTTI_DECLARATIONS(Planet, Library::GameComponent)
+		RTTI_DECLARATIONS(CelestialBody, Library::GameComponent)
 
 	public:
-		Planet(Library::Game* game, float rotation, const std::wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, Planet* orbitAround, bool isLit);
+		CelestialBody(Library::Game* game, float rotation, const std::wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, CelestialBody* orbitAround, bool isLit);
 		virtual void Update(const Library::GameTime& gameTime) override;
 
 		void* operator new(size_t i);
@@ -19,6 +19,7 @@ namespace SolarSystem
 
 		DirectX::XMMATRIX WorldMatrix();
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ColorTexture();
+		float BodySize();
 		bool IsLit();
 
 	private:
@@ -28,11 +29,12 @@ namespace SolarSystem
 		float mRotation;
 		float mRevolution;
 		float mOrbit;
+		float mSize;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mColorTexture;
 		DirectX::XMFLOAT4X4 mWorldMatrix;
 		DirectX::XMMATRIX mScale;
 		DirectX::XMMATRIX mOrbitalDistance;
-		Planet* mParent;
+		CelestialBody* mParent;
 		bool mIsLit;
 	};
 }

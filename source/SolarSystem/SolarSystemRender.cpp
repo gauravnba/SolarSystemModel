@@ -13,8 +13,8 @@ namespace Rendering
 	const float SolarSystemRender::LightMovementRate = 10.0f;
 
 	SolarSystemRender::SolarSystemRender(Game& game, const shared_ptr<Camera>& camera) :
-		DrawableGameComponent(game, camera), mPointLight(game, XMFLOAT3(0.0f, 0.0f, 0.0f), 25000.0f),
-		mRenderStateHelper(game), mIndexCount(0), mTextPosition(0.0f, 40.0f), mAnimationEnabled(true)
+		DrawableGameComponent(game, camera), mPointLight(game, XMFLOAT3(0.0f, 0.0f, 0.0f), 30000.0f),
+		mRenderStateHelper(game), mIndexCount(0), mTextPosition(0.0f, 40.0f), mAnimationEnabled(true), mSkyBox(game, camera, L"Content\\Textures\\stars.dds", 1000.0f), mCurrentPlanet(0)
 	{
 	}
 
@@ -95,39 +95,36 @@ namespace Rendering
 		mGame->Direct3DDeviceContext()->UpdateSubresource(mVSCBufferPerFrame.Get(), 0, nullptr, &mVSCBufferPerFrameData, 0, 0);
 		mGame->Direct3DDeviceContext()->UpdateSubresource(mPSCBufferPerObject.Get(), 0, nullptr, &mPSCBufferPerObjectData, 0, 0);
 
-		// Load a proxy model for the point light
-		//mProxyModel = make_unique<ProxyModel>(*mGame, mCamera, "Content\\Models\\Sphere.obj.bin", 0.5f);
-		//mProxyModel->Initialize();
-		//mProxyModel->SetPosition(mPointLight.Position());
+		mSkyBox.Initialize();
 
 		// Earth properties declarations
 		const float earthRotation = XM_PI * 5;
 		const float earthAxialTilt = 0.4101524f;
 		const float earthScale = 1.0f;
-		const float earthOrbitalDistance = 200.0f;
+		const float earthOrbitalDistance = 300.0f;
 		const float earthRevolution = earthRotation / 365;
 
 		// Populate the planet list
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.0408f, L"Content\\Textures\\2k_sun.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.0f, earthScale * 15.0f, earthRevolution, nullptr, false)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 4.149f, nullptr, true)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.004f, L"Content\\Textures\\venusmap.jpg", earthAxialTilt * 0.959f, earthOrbitalDistance * 0.723f, earthScale * 0.949f, earthRevolution * 1.624f, nullptr, true)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr, true)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation, L"Content\\Textures\\marsmap1k.jpg", 0.4392f, earthOrbitalDistance * 1.524f, earthScale * 0.532f, earthRevolution * 0.531f, nullptr, true)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 2.4f, L"Content\\Textures\\jupiter2_2k.jpg", 0.05352f, earthOrbitalDistance * 5.203f, earthScale * 11.19f, earthRevolution * 0.084f, nullptr, true)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 2.3f, L"Content\\Textures\\saturnmap.jpg", 0.4712f, earthOrbitalDistance * 9.582f, earthScale * 9.26f, earthRevolution * 0.034f, nullptr, true)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 1.39f, L"Content\\Textures\\uranusmap.jpg", 1.6927f, earthOrbitalDistance * 19.20f, earthScale * 4.01f, earthRevolution * 0.011f, nullptr, true)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 1.489f, L"Content\\Textures\\neptunemap.jpg", 0.5166f, earthOrbitalDistance * 30.5f, earthScale * 3.88f, earthRevolution * 0.0061f, nullptr, true)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRotation * 0.156f, L"Content\\Textures\\plutomap2k.jpg", 2.129f, earthOrbitalDistance * 39.48f, earthScale * 0.18f, earthRevolution * 0.004f, nullptr, true)));
-		mPlanetList.push_back(make_unique<Planet>(Planet(mGame, earthRevolution * 12, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.05f, earthScale/ 20, earthRevolution * 12, mPlanetList[3].get(), true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.0408f, L"Content\\Textures\\2k_sun.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.0f, earthScale * 15.0f, earthRevolution, nullptr, false)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 4.149f, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.004f, L"Content\\Textures\\venusmap.jpg", earthAxialTilt * 0.959f, earthOrbitalDistance * 0.723f, earthScale * 0.949f, earthRevolution * 1.624f, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation, L"Content\\Textures\\marsmap1k.jpg", 0.4392f, earthOrbitalDistance * 1.524f, earthScale * 0.532f, earthRevolution * 0.531f, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 2.4f, L"Content\\Textures\\jupiter2_2k.jpg", 0.05352f, earthOrbitalDistance * 5.203f, earthScale * 11.19f, earthRevolution * 0.084f, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 2.3f, L"Content\\Textures\\saturnmap.jpg", 0.4712f, earthOrbitalDistance * 9.582f, earthScale * 9.26f, earthRevolution * 0.034f, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 1.39f, L"Content\\Textures\\uranusmap.jpg", 1.6927f, earthOrbitalDistance * 19.20f, earthScale * 4.01f, earthRevolution * 0.011f, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 1.489f, L"Content\\Textures\\neptunemap.jpg", 0.5166f, earthOrbitalDistance * 30.5f, earthScale * 3.88f, earthRevolution * 0.0061f, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.156f, L"Content\\Textures\\plutomap2k.jpg", 2.129f, earthOrbitalDistance * 39.48f, earthScale * 0.18f, earthRevolution * 0.004f, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRevolution * 12, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.05f, earthScale/ 20, earthRevolution * 12, mCelestialBodiesList[3].get(), true)));
 	}
 
 	void SolarSystemRender::Update(const GameTime& gameTime)
 	{
 		if (mAnimationEnabled)
 		{
-			for (uint32_t i = 0; i < mPlanetList.size(); ++i)
+			for (uint32_t i = 0; i < mCelestialBodiesList.size(); ++i)
 			{
-				mPlanetList[i]->Update(gameTime);
+				mCelestialBodiesList[i]->Update(gameTime);
 			}
 		}
 
@@ -137,14 +134,21 @@ namespace Rendering
 			{
 				ToggleAnimation();
 			}
+			if (mKeyboard->WasKeyPressedThisFrame(Keys::R))
+			{
+				ReturnToStart();
+			}
+			if (mKeyboard->WasKeyPressedThisFrame(Keys::Up))
+			{
+				JumpToNextPlanet();
+			}
 		}
 
-		//mProxyModel->Update(gameTime);
+		mSkyBox.Update(gameTime);
 	}
 
 	void SolarSystemRender::Draw(const GameTime& gameTime)
 	{
-		UNREFERENCED_PARAMETER(gameTime);
 		assert(mCamera != nullptr);
 
 		ID3D11DeviceContext* direct3DDeviceContext = mGame->Direct3DDeviceContext();
@@ -158,9 +162,9 @@ namespace Rendering
 
 		direct3DDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
 
-		for (uint32_t i = 0; i < mPlanetList.size(); ++i)
+		for (uint32_t i = 0; i < mCelestialBodiesList.size(); ++i)
 		{
-			if (mPlanetList[i]->IsLit())
+			if (mCelestialBodiesList[i]->IsLit())
 			{
 				direct3DDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
 			}
@@ -169,7 +173,7 @@ namespace Rendering
 				direct3DDeviceContext->PSSetShader(mSunShader.Get(), nullptr, 0);
 			}
 
-			XMMATRIX worldMatrix = mPlanetList[i]->WorldMatrix();
+			XMMATRIX worldMatrix = mCelestialBodiesList[i]->WorldMatrix();
 			XMMATRIX wvp = worldMatrix * mCamera->ViewProjectionMatrix();
 			wvp = XMMatrixTranspose(wvp);
 			XMStoreFloat4x4(&mVSCBufferPerObjectData.WorldViewProjection, wvp);
@@ -185,14 +189,14 @@ namespace Rendering
 			ID3D11Buffer* PSConstantBuffers[] = { mPSCBufferPerFrame.Get(), mPSCBufferPerObject.Get() };
 			direct3DDeviceContext->PSSetConstantBuffers(0, ARRAYSIZE(PSConstantBuffers), PSConstantBuffers);
 
-			ID3D11ShaderResourceView* PSShaderResources[] = { mPlanetList[i]->ColorTexture().Get() };
+			ID3D11ShaderResourceView* PSShaderResources[] = { mCelestialBodiesList[i]->ColorTexture().Get() };
 			direct3DDeviceContext->PSSetShaderResources(0, ARRAYSIZE(PSShaderResources), PSShaderResources);
 			direct3DDeviceContext->PSSetSamplers(0, 1, SamplerStates::TrilinearWrap.GetAddressOf());
 
 			direct3DDeviceContext->DrawIndexed(mIndexCount, 0, 0);
 		}
 
-		//mProxyModel->Draw(gameTime);
+		mSkyBox.Draw(gameTime);
 		
 		// Draw help text
 		mRenderStateHelper.SaveAll();
@@ -200,8 +204,9 @@ namespace Rendering
 
 		wostringstream helpLabel;
 		helpLabel << L"Move(Mouse + WASD)" << "\n";
-		helpLabel << L"Change Camera Speed(Scroll Wheel): " << static_pointer_cast<FirstPersonCamera>(mCamera)->MovementFactor() << "\n";
-		helpLabel << L"Toggle Grid (G)" << "\n";
+		helpLabel << L"Change Camera Speed (Scroll Wheel): " << static_pointer_cast<FirstPersonCamera>(mCamera)->MovementFactor() << "\n";
+		helpLabel << L"Jump to next celestial body (Up)" << "\n";
+		helpLabel << L"Return to Sun (R)" << "\n";
 		helpLabel << L"Toggle Animation (Space)" << "\n";
 	
 		mSpriteFont->DrawString(mSpriteBatch.get(), helpLabel.str().c_str(), mTextPosition);
@@ -238,5 +243,21 @@ namespace Rendering
 	void SolarSystemRender::ToggleAnimation()
 	{
 		mAnimationEnabled = !mAnimationEnabled;
+	}
+
+	void SolarSystemRender::ReturnToStart()
+	{
+		mCamera->SetPosition(0.0f, 2.5f, 500.0f);
+	}
+
+	void SolarSystemRender::JumpToNextPlanet()
+	{
+		XMFLOAT3 translateTo;
+		if (++mCurrentPlanet > mCelestialBodiesList.size())
+		{
+			mCurrentPlanet = 0;
+		}
+		MatrixHelper::GetTranslation(mCelestialBodiesList[mCurrentPlanet]->WorldMatrix(), translateTo);
+		mCamera->SetPosition(translateTo.x, translateTo.y, translateTo.z);
 	}
 }

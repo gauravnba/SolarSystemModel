@@ -17,7 +17,7 @@ namespace Library
 		Camera& operator=(const Camera&) = default;
 		Camera(Camera&&) = default;
 		Camera& operator=(Camera&&) = default;
-		virtual ~Camera() = default;		
+		virtual ~Camera() = default;
 
 		const DirectX::XMFLOAT3& Position() const;
 		const DirectX::XMFLOAT3& Direction() const;
