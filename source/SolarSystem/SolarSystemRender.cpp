@@ -98,24 +98,28 @@ namespace Rendering
 		mSkyBox.Initialize();
 
 		// Earth properties declarations
-		const float earthRotation = XM_PI * 5;
+		const float earthRotation = XM_PI;
 		const float earthAxialTilt = 0.4101524f;
 		const float earthScale = 1.0f;
-		const float earthOrbitalDistance = 300.0f;
+		const float earthOrbitalDistance = 500.0f;
 		const float earthRevolution = earthRotation / 365;
 
 		// Populate the planet list
-		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.0408f, L"Content\\Textures\\2k_sun.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.0f, earthScale * 15.0f, earthRevolution, nullptr, false)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.0408f, L"Content\\Textures\\2k_sun.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.0f, earthScale * 20.0f, earthRevolution, nullptr, false)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 4.149f, nullptr, true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.004f, L"Content\\Textures\\venusmap.jpg", earthAxialTilt * 0.959f, earthOrbitalDistance * 0.723f, earthScale * 0.949f, earthRevolution * 1.624f, nullptr, true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRevolution * 12, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.05f, earthScale / 20, earthRevolution * 12, mCelestialBodiesList[3].get(), true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation, L"Content\\Textures\\marsmap1k.jpg", 0.4392f, earthOrbitalDistance * 1.524f, earthScale * 0.532f, earthRevolution * 0.531f, nullptr, true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 2.4f, L"Content\\Textures\\jupiter2_2k.jpg", 0.05352f, earthOrbitalDistance * 5.203f, earthScale * 11.19f, earthRevolution * 0.084f, nullptr, true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.01f, L"Content\\Textures\\callisto.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.4f, earthScale / 3, earthRotation * 2.4f / 16.7f, mCelestialBodiesList[6].get(), true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.2f, L"Content\\Textures\\europa.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.3f, earthScale / 4, earthRotation * 2.4f / 3.551f, mCelestialBodiesList[6].get(), true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.05f, L"Content\\Textures\\ganymede.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.35f, earthScale / 2.5f, earthRotation * 2.4f / 7.155f, mCelestialBodiesList[6].get(), true)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.4f, L"Content\\Textures\\Io.png", earthAxialTilt * 0, earthOrbitalDistance * 0.25f, earthScale / 3, earthRotation * 2.4f / 1.769f, mCelestialBodiesList[6].get(), true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 2.3f, L"Content\\Textures\\saturnmap.jpg", 0.4712f, earthOrbitalDistance * 9.582f, earthScale * 9.26f, earthRevolution * 0.034f, nullptr, true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 1.39f, L"Content\\Textures\\uranusmap.jpg", 1.6927f, earthOrbitalDistance * 19.20f, earthScale * 4.01f, earthRevolution * 0.011f, nullptr, true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 1.489f, L"Content\\Textures\\neptunemap.jpg", 0.5166f, earthOrbitalDistance * 30.5f, earthScale * 3.88f, earthRevolution * 0.0061f, nullptr, true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.156f, L"Content\\Textures\\plutomap2k.jpg", 2.129f, earthOrbitalDistance * 39.48f, earthScale * 0.18f, earthRevolution * 0.004f, nullptr, true)));
-		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRevolution * 12, L"Content\\Textures\\moonmap2k.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.05f, earthScale/ 20, earthRevolution * 12, mCelestialBodiesList[3].get(), true)));
 	}
 
 	void SolarSystemRender::Update(const GameTime& gameTime)
