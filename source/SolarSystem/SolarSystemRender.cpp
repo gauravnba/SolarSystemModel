@@ -105,7 +105,7 @@ namespace Rendering
 		const float earthRevolution = earthRotation / 365;
 
 		// Populate the planet list
-		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.0408f, L"Content\\Textures\\2k_sun.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.0f, earthScale * 20.0f, earthRevolution, nullptr, false)));
+		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.0408f, L"Content\\Textures\\2k_sun.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.01f, earthScale * 20.0f, earthRevolution, nullptr, false)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.017f, L"Content\\Textures\\mercurymap.jpg", earthAxialTilt * 0, earthOrbitalDistance * 0.387f, earthScale * 0.382f, earthRevolution * 4.149f, nullptr, true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation * 0.004f, L"Content\\Textures\\venusmap.jpg", earthAxialTilt * 0.959f, earthOrbitalDistance * 0.723f, earthScale * 0.949f, earthRevolution * 1.624f, nullptr, true)));
 		mCelestialBodiesList.push_back(make_unique<CelestialBody>(CelestialBody(mGame, earthRotation, L"Content\\Textures\\EarthComposite.jpg", earthAxialTilt, earthOrbitalDistance, earthScale, earthRevolution, nullptr, true)));
@@ -257,9 +257,9 @@ namespace Rendering
 	void SolarSystemRender::JumpToNextPlanet()
 	{
 		XMFLOAT3 translateTo;
-		if (++mCurrentPlanet > mCelestialBodiesList.size())
+		if (++mCurrentPlanet >= mCelestialBodiesList.size())
 		{
-			mCurrentPlanet = 0;
+			mCurrentPlanet = 1;
 		}
 		MatrixHelper::GetTranslation(mCelestialBodiesList[mCurrentPlanet]->WorldMatrix(), translateTo);
 		mCamera->SetPosition(translateTo.x, translateTo.y, translateTo.z);

@@ -43,7 +43,7 @@
     <FxCompile Include="Content\Shaders\SolarSystemVS.hlsl">
       <Filter>Content\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="SunShaderPS.hlsl">
+    <FxCompile Include="Content\Shaders\SunShaderPS.hlsl">
       <Filter>Content\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
