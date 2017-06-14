@@ -257,9 +257,9 @@ namespace Rendering
 	void SolarSystemRender::JumpToNextPlanet()
 	{
 		XMFLOAT3 translateTo;
-		if (++mCurrentPlanet > mCelestialBodiesList.size())
+		if (++mCurrentPlanet >= mCelestialBodiesList.size())
 		{
-			mCurrentPlanet = 0;
+			mCurrentPlanet = 1;
 		}
 		MatrixHelper::GetTranslation(mCelestialBodiesList[mCurrentPlanet]->WorldMatrix(), translateTo);
 		mCamera->SetPosition(translateTo.x, translateTo.y, translateTo.z);
