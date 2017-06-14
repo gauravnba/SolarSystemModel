@@ -7,7 +7,7 @@ namespace Library
     RTTI_DEFINITIONS(PerspectiveCamera)
 
     const float PerspectiveCamera::DefaultFieldOfView = XM_PIDIV4;
-	const float PerspectiveCamera::DefaultAspectRatio = 4.0f / 3.0f;
+	const float PerspectiveCamera::DefaultAspectRatio = 16.0f / 9.0f;
 
     PerspectiveCamera::PerspectiveCamera(Game& game) :
 		Camera(game),

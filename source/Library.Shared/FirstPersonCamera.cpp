@@ -6,7 +6,7 @@ namespace Library
 {
 	RTTI_DEFINITIONS(FirstPersonCamera)
 
-		const float FirstPersonCamera::DefaultMouseSensitivity = 0.1f;
+	const float FirstPersonCamera::DefaultMouseSensitivity = 0.1f;
 	const float FirstPersonCamera::DefaultRotationRate = XMConvertToRadians(100.0f);
 	const float FirstPersonCamera::DefaultMovementRate = 100.0f;
 	const float FirstPersonCamera::DefaultMovementFactor = 3.0f;

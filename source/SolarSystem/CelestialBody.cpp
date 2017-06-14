@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Planet.h"
+#include "CelestialBody.h"
 
 using namespace std;
 using namespace Library;
@@ -7,11 +7,11 @@ using namespace DirectX;
 
 namespace SolarSystem
 {
-	RTTI_DEFINITIONS(Planet)
+	RTTI_DEFINITIONS(CelestialBody)
 
-	Planet::Planet(Game* game , float rotation, const wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, Planet* orbitAround, bool isLit) :
+	CelestialBody::CelestialBody(Game* game , float rotation, const wstring& texture, float axialTilt, float orbitalDistance, float scale, float revolutionRate, CelestialBody* orbitAround, bool isLit) :
 		mRotationRate(rotation), mRevolutionRate(revolutionRate), mWorldMatrix(MatrixHelper::Identity), mAxialTilt(axialTilt), mParent(orbitAround), 
-		mRotation(0.0f), mRevolution(0.0f), mOrbit(orbitalDistance), mIsLit(isLit)
+		mRotation(0.0f), mRevolution(0.0f), mOrbit(orbitalDistance), mIsLit(isLit), mSize(scale)
 	{
 		mScale = XMMatrixScaling(scale, scale, scale);
 		mOrbitalDistance = XMMatrixTranslation(orbitalDistance, 0.0f, 0.0f);
@@ -19,32 +19,32 @@ namespace SolarSystem
 		ThrowIfFailed(CreateWICTextureFromFile(game->Direct3DDevice(), texture.c_str(), nullptr, mColorTexture.ReleaseAndGetAddressOf()), "CreateDDSTextureFromFile() failed.");
 	}
 
-	void* Planet::operator new(size_t i)
+	void* CelestialBody::operator new(size_t i)
 	{
 		return _mm_malloc(i, 16);
 	}
 
-	void Planet::operator delete(void* p)
+	void CelestialBody::operator delete(void* p)
 	{
 		return _mm_free(p);
 	}
 
-	XMMATRIX Planet::WorldMatrix()
+	XMMATRIX CelestialBody::WorldMatrix()
 	{
 		return XMLoadFloat4x4(&mWorldMatrix);
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> Planet::ColorTexture()
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CelestialBody::ColorTexture()
 	{
 		return mColorTexture;
 	}
 
-	bool Planet::IsLit()
+	bool CelestialBody::IsLit()
 	{
 		return mIsLit;
 	}
 
-	void Planet::Update(const Library::GameTime& gameTime)
+	void CelestialBody::Update(const Library::GameTime& gameTime)
 	{
 			mRotation += gameTime.ElapsedGameTimeSeconds().count() * mRotationRate;
 			mRevolution += gameTime.ElapsedGameTimeSeconds().count() * mRevolutionRate;
@@ -60,5 +60,10 @@ namespace SolarSystem
 				MatrixHelper::GetTranslation(XMLoadFloat4x4(&mParent->mWorldMatrix), parentPosition);
 				XMStoreFloat4x4(&mWorldMatrix, mScale * XMMatrixRotationY(mRotation) * XMMatrixRotationZ(mAxialTilt) * mOrbitalDistance * XMMatrixRotationY(mRevolution) * XMMatrixTranslation(parentPosition.x, parentPosition.y, parentPosition.z));
 			}
+	}
+
+	float CelestialBody::BodySize()
+	{
+		return mSize;
 	}
 }

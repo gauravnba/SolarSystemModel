@@ -18,14 +18,14 @@
     <ClCompile Include="RenderingGame.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Planet.cpp" />
     <ClCompile Include="SolarSystemRender.cpp" />
+    <ClCompile Include="CelestialBody.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RenderingGame.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Planet.h" />
     <ClInclude Include="SolarSystemRender.h" />
+    <ClInclude Include="CelestialBody.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Content\Models\PointLightProxy.obj.bin">

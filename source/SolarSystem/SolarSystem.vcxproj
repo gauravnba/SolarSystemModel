@@ -227,14 +227,14 @@ IF EXIST "$(ProjectDir)content" xcopy /E /Y "$(ProjectDir)Content" "$(OutDir)Con
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Planet.cpp" />
+    <ClCompile Include="CelestialBody.cpp" />
     <ClCompile Include="SolarSystemRender.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="RenderingGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Planet.h" />
+    <ClInclude Include="CelestialBody.h" />
     <ClInclude Include="SolarSystemRender.h" />
     <ClInclude Include="RenderingGame.h" />
   </ItemGroup>

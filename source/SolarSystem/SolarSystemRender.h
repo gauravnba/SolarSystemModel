@@ -3,7 +3,7 @@
 #include "DrawableGameComponent.h"
 #include "RenderStateHelper.h"
 #include "PointLight.h"
-#include "Planet.h"
+#include "CelestialBody.h"
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 
@@ -96,6 +96,9 @@ namespace Rendering
 
 		void CreateVertexBuffer(const Library::Mesh& mesh, ID3D11Buffer** vertexBuffer) const;
 		void ToggleAnimation();
+		void ReturnToStart();
+		void JumpToNextPlanet();
+
 		static const float LightModulationRate;
 		static const float LightMovementRate;
 
@@ -105,6 +108,7 @@ namespace Rendering
 		PSCBufferPerObject mPSCBufferPerObjectData;
 		Library::PointLight mPointLight;
 		Library::RenderStateHelper mRenderStateHelper;
+		Library::Skybox mSkyBox;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mSunShader;
@@ -120,7 +124,8 @@ namespace Rendering
 		std::unique_ptr<DirectX::SpriteBatch> mSpriteBatch;
 		std::unique_ptr<DirectX::SpriteFont> mSpriteFont;
 		DirectX::XMFLOAT2 mTextPosition;
-		std::vector<std::unique_ptr<SolarSystem::Planet>> mPlanetList;
+		std::vector<std::unique_ptr<SolarSystem::CelestialBody>> mCelestialBodiesList;
+		std::uint32_t mCurrentPlanet;
 		bool mAnimationEnabled;
 	};
 }
