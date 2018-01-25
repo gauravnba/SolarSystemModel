@@ -4,7 +4,7 @@
 This project was created to learn the basics of graphics programming and how to apply matrix mathematics to obtain movements of the planets.
 I created a model of our Solar System with the the sun, the 8 planets, Pluto and some select moons. I used a framework to help start the project, created by Dr. Paul Varcholik at https://bitbucket.org/pvarcholik/bespoke.games.framework
 
-<img src="screens/Earth.png" width="434"/> <img src="screens/Pluto.png" width="434"/> 
+<img src="screens/Earth.png" width="440"/> <img src="screens/Pluto.png" width="440"/> 
 
 All the celestial bodies are lit by point lighting provided by the sun. The sun itself is unlit, since the point-light resides within the bounds of its mesh. I had to scale down the distances between the planets and their moons so that the model can be observed much more comfortably. I have used Space Engine (http://spaceengine.org/) to obtain the skybox texture I have used. One thing of note: I have not yet added the rings of Saturn (or Uranus or Neptune), since obtaining the mesh for those seems to be a much more difficult task.
 All celestial bodies use the DirectX math library to apply transformation matrices to facilitate their movement.
